@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#111a3a">
+<title>Brain Quest</title>
+<style>
+:root{--bg:#101832;--panel:#1b2850;--panel2:#243665;--gold:#ffd166;--mint:#67e8c1;--text:#f7f8ff;--muted:#bdc8e8;--pink:#ff7aa8}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0%,#354b91 0,#17244b 38%,#0c132a 100%);color:var(--text);font-family:system-ui,-apple-system,"Noto Sans Telugu",sans-serif;min-height:100vh}
+button,select{font:inherit}button{border:0;cursor:pointer}.app{max-width:760px;margin:auto;padding:18px 15px 36px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px}.brand{font-weight:900;font-size:22px;letter-spacing:.3px}.brand span{color:var(--gold)}.pill{background:#263967;border:1px solid #536ba4;padding:8px 12px;border-radius:30px;font-weight:700}
+.hero{margin:22px 0 16px;padding:22px;border-radius:25px;background:linear-gradient(135deg,#4b4bd0,#793fc0 58%,#e16b9a);box-shadow:0 16px 35px #0005;position:relative;overflow:hidden}.hero:after{content:"✦";position:absolute;font-size:120px;right:20px;top:-18px;opacity:.18}.hero h1{font-size:clamp(27px,7vw,42px);margin:0 0 6px}.hero p{margin:0;color:#f3eaff;max-width:80%}
+.panel{background:#18264bdf;border:1px solid #53699c80;border-radius:22px;padding:18px;margin:14px 0;box-shadow:0 10px 25px #0002}
+h2{font-size:20px;margin:0 0 12px}.muted{color:var(--muted)}.row{display:flex;gap:10px;flex-wrap:wrap}.field{flex:1;min-width:130px}label{display:block;font-size:13px;color:var(--muted);margin:0 0 6px}
+select{width:100%;padding:12px;border-radius:12px;color:white;background:#263967;border:1px solid #5d74aa}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.subject{padding:15px 12px;border-radius:16px;background:linear-gradient(145deg,#2b4178,#202f5b);color:white;text-align:left;border:1px solid #5c75ad;font-weight:800;min-height:82px}.subject small{display:block;color:#c9d6f5;font-weight:500;margin-top:5px}
+.primary{width:100%;padding:15px;border-radius:15px;background:linear-gradient(90deg,#ffd166,#ff9f68);color:#332044;font-weight:900;font-size:17px;margin-top:12px;box-shadow:0 7px 0 #a85d48}.secondary{padding:12px 15px;border-radius:13px;background:#304779;color:white;font-weight:750;border:1px solid #6982b8}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat{background:#253866;border-radius:15px;padding:12px;text-align:center}.stat b{display:block;color:var(--gold);font-size:21px}.stat span{font-size:12px;color:var(--muted)}
+.hidden{display:none!important}.progress{height:9px;background:#34466f;border-radius:9px;overflow:hidden;margin:12px 0}.bar{height:100%;background:linear-gradient(90deg,var(--mint),#b8f77d);width:0;transition:width .25s}
+.question{font-size:22px;line-height:1.4;margin:18px 0}.answers{display:grid;gap:10px}.answer{padding:14px;border:1px solid #647bb0;border-radius:14px;background:#263967;color:white;text-align:left;font-weight:700}.answer.correct{background:#176c58;border-color:#67e8c1}.answer.wrong{background:#813e58;border-color:#ff9ab8}.feedback{padding:13px;border-radius:13px;background:#263967;margin-top:13px;color:#eaf1ff}
+.footer{text-align:center;color:#9eadd1;font-size:12px;margin-top:22px}.bigemoji{font-size:38px}.result{text-align:center;padding:18px}.result .score{font-size:52px;color:var(--gold);font-weight:950}
+@media(min-width:600px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><div class="brand">🧠 BRAIN <span>QUEST</span></div><div class="pill">🪙 <span id="coins">0</span></div></div>
+  <section class="hero"><h1 id="heroTitle">Play. Explore. Learn. Win!</h1><p id="heroSub">A fun learning adventure for Classes 1–10.</p></section>
+
+  <section id="home">
+    <div class="panel">
+      <h2 id="setupTitle">Set up your adventure</h2>
+      <div class="row">
+        <div class="field"><label id="gradeLabel" for="grade">Your class</label><select id="grade">
+          <option value="1">Class 1</option><option value="2">Class 2</option><option value="3">Class 3</option><option value="4">Class 4</option><option value="5">Class 5</option><option value="6" selected>Class 6</option><option value="7">Class 7</option><option value="8">Class 8</option><option value="9">Class 9</option><option value="10">Class 10</option>
+        </select></div>
+        <div class="field"><label id="languageLabel" for="language">Language</label><select id="language"><option value="en">English</option><option value="te">తెలుగు (Telugu)</option></select></div>
+      </div>
+      <div class="stats" style="margin-top:14px"><div class="stat"><b id="bestScore">0</b><span id="bestLabel">Best score</span></div><div class="stat"><b id="played">0</b><span id="playedLabel">Games played</span></div><div class="stat"><b id="totalCoins">0</b><span id="coinLabel">Coins earned</span></div></div>
+    </div>
+    <div class="panel"><h2 id="chooseTitle">Choose your learning world</h2><div class="grid" id="subjects"></div></div>
+  </section>
+
+  <section id="game" class="panel hidden">
+    <div class="row" style="justify-content:space-between;align-items:center"><div class="pill" id="subjectName">🌟 Quiz</div><div class="pill"><span id="qCount">1/10</span></div></div>
+    <div class="progress"><div class="bar" id="progress"></div></div>
+    <div class="muted" id="gradeInfo">Class 6 · 10 questions</div>
+    <div class="question" id="question">Question appears here</div>
+    <div class="answers" id="answers"></div>
+    <div id="feedback" class="feedback hidden"></div>
+    <button id="nextBtn" class="primary hidden">Next question →</button>
+    <button id="quitBtn" class="secondary" style="margin-top:12px;width:100%">← Back to worlds</button>
+  </section>
+
+  <section id="result" class="panel hidden result">
+    <div class="bigemoji" id="resultEmoji">🏆</div><h2 id="resultTitle">Adventure complete!</h2>
+    <div class="score"><span id="finalScore">0</span>/100</div>
+    <p id="resultMessage" class="muted">Great work!</p>
+    <div class="stats"><div class="stat"><b id="correctCount">0</b><span id="correctLabel">Correct</span></div><div class="stat"><b id="earnedCoins">0</b><span id="earnedLabel">Coins earned</span></div><div class="stat"><b id="accuracy">0%</b><span id="accuracyLabel">Accuracy</span></div></div>
+    <button class="primary" id="homeBtn">Play another world</button>
+  </section>
+  <div class="footer">Brain Quest · Stage 1 prototype · Offline play · Progress saved on this device</div>
+</div>
+<script>
+const data = {
+ math:[
+  ["What is 5 + 3?","5 + 3 ఎంత?","8","6","7","9","8","Adding 5 and 3 gives 8.","5 మరియు 3 కలిపితే 8."],
+  ["Which number comes after 19?","19 తర్వాత వచ్చే సంఖ్య ఏది?","20","18","21","29","20","The number after 19 is 20.","19 తర్వాత 20 వస్తుంది."],
+  ["What is 6 × 4?","6 × 4 ఎంత?","24","10","20","28","24","6 groups of 4 make 24.","6 × 4 = 24."],
+  ["How many sides does a triangle have?","త్రిభుజానికి ఎన్ని భుజాలు ఉంటాయి?","3","4","5","6","3","A triangle has three sides.","త్రిభుజానికి మూడు భుజాలు ఉంటాయి."],
+  ["What is half of 50?","50 లో సగం ఎంత?","25","20","30","15","25","50 divided by 2 is 25.","50 ను 2 తో భాగిస్తే 25."],
+  ["What is 100 − 35?","100 − 35 ఎంత?","65","75","55","60","65","100 minus 35 equals 65.","100 − 35 = 65."],
+  ["Which is the smallest fraction?","వీటిలో చిన్న భిన్నం ఏది?","1/4","1/2","3/4","1","1/4","One quarter is smaller than one half and three quarters.","1/4 అనేది 1/2 కంటే చిన్నది."],
+  ["What is the perimeter of a square with side 4 cm?","4 సెం.మీ. భుజం ఉన్న చతురస్రం చుట్టుకొలత ఎంత?","16 cm","8 cm","12 cm","20 cm","16 cm","Perimeter = 4 × side = 16 cm.","చుట్టుకొలత = 4 × 4 = 16 సెం.మీ."],
+  ["What is 12 squared?","12 యొక్క వర్గం ఎంత?","144","24","124","122","144","12 × 12 = 144.","12 × 12 = 144."],
+  ["What is 15% of 200?","200 లో 15% ఎంత?","30","15","20","45","30","0.15 × 200 = 30.","0.15 × 200 = 30."]
+ ],
+ science:[
+  ["Which planet is called the Red Planet?","ఎర్ర గ్రహం అని ఏ గ్రహాన్ని పిలుస్తారు?","Mars","Earth","Venus","Jupiter","Mars","Mars looks red because of iron-rich dust.","ఇనుము కలిగిన ధూళి వల్ల అంగారక గ్రహం ఎర్రగా కనిపిస్తుంది."],
+  ["Which part of a plant absorbs water?","మొక్కలో నీటిని పీల్చుకునే భాగం ఏది?","Roots","Leaves","Flower","Fruit","Roots","Roots absorb water and minerals from soil.","వేర్లు నేల నుండి నీరు, ఖనిజాలను పీల్చుకుంటాయి."],
+  ["What gas do humans need to breathe?","మనుషులు శ్వాసించడానికి అవసరమైన వాయువు ఏది?","Oxygen","Carbon dioxide","Helium","Hydrogen","Oxygen","Our cells use oxygen to release energy.","మన శరీర కణాలు శక్తిని విడుదల చేయడానికి ఆక్సిజన్‌ను ఉపయోగిస్తాయి."],
+  ["What is H₂O commonly called?","H₂O ను సాధారణంగా ఏమంటారు?","Water","Salt","Oxygen","Sugar","Water","H₂O is the chemical formula for water.","H₂O అనేది నీటి రసాయన సూత్రం."],
+  ["Which force pulls objects toward Earth?","వస్తువులను భూమి వైపు లాగే బలం ఏది?","Gravity","Friction","Magnetism","Sound","Gravity","Gravity attracts objects toward one another.","గురుత్వాకర్షణ వస్తువులను ఒకదానికొకటి ఆకర్షిస్తుంది."],
+  ["Which organ pumps blood?","రక్తాన్ని పంప్ చేసే అవయవం ఏది?","Heart","Lungs","Brain","Kidney","Heart","The heart pumps blood around the body.","గుండె శరీరమంతా రక్తాన్ని పంపుతుంది."],
+  ["At what temperature does water boil at sea level?","సముద్ర మట్టం వద్ద నీరు ఎంత ఉష్ణోగ్రతకు మరుగుతుంది?","100°C","0°C","50°C","80°C","100°C","Pure water boils at about 100°C at sea level.","సముద్ర మట్టం వద్ద స్వచ్ఛమైన నీరు సుమారు 100°C వద్ద మరుగుతుంది."],
+  ["Which is the largest organ of the human body?","మానవ శరీరంలో అతిపెద్ద అవయవం ఏది?","Skin","Heart","Liver","Brain","Skin","The skin covers and protects the body.","చర్మం శరీరాన్ని కప్పి రక్షిస్తుంది."],
+  ["What is the center of an atom called?","పరమాణువు మధ్య భాగాన్ని ఏమంటారు?","Nucleus","Cell","Orbit","Electron","Nucleus","The nucleus contains protons and neutrons.","కేంద్రకంలో ప్రోటాన్లు, న్యూట్రాన్లు ఉంటాయి."],
+  ["Which process do plants use to make food?","మొక్కలు ఆహారం తయారు చేసుకునే ప్రక్రియ ఏది?","Photosynthesis","Respiration","Digestion","Evaporation","Photosynthesis","Plants use light, water and carbon dioxide to make food.","మొక్కలు కాంతి, నీరు, కార్బన్ డైఆక్సైడ్‌తో ఆహారం తయారు చేస్తాయి."]
+ ],
+ english:[
+  ["Choose the opposite of 'happy'.","'Happy' అనే పదానికి వ్యతిరేక పదం ఎంచుకోండి.","Sad","Glad","Joyful","Cheerful","Sad","Sad is an antonym of happy.","Sad అనేది Happy కి వ్యతిరేక పదం."],
+  ["Which word is a noun?","నామవాచకం ఏది?","Teacher","Quickly","Beautiful","Run","Teacher","A noun names a person, place, animal or thing.","Noun అనేది వ్యక్తి, ప్రదేశం, జంతువు లేదా వస్తువు పేరు."],
+  ["Choose the correct spelling.","సరైన అక్షరక్రమాన్ని ఎంచుకోండి.","Beautiful","Beutiful","Beautifull","Butiful","Beautiful","Beautiful is the correct spelling.","Beautiful సరైన అక్షరక్రమం."],
+  ["What is the past tense of 'go'?","'Go' యొక్క భూతకాల రూపం ఏది?","Went","Goed","Going","Goes","Went","The past tense of go is went.","Go యొక్క భూతకాల రూపం Went."],
+  ["Which punctuation ends a question?","ప్రశ్న చివర ఏ విరామ చిహ్నం వాడతారు?","?","!"," .",",","?","A question mark ends a direct question.","ప్రశ్నార్థకం ప్రశ్న చివర వాడతారు."],
+  ["Choose the plural of 'child'.","'Child' యొక్క బహువచనం ఏది?","Children","Childs","Childes","Childrens","Children","Children is the irregular plural of child.","Child యొక్క బహువచనం Children."],
+  ["Which is an adjective?","విశేషణం ఏది?","Bright","Slowly","Jump","Under","Bright","An adjective describes a noun.","విశేషణం నామవాచకాన్ని వివరిస్తుంది."],
+  ["Fill in: She ___ to school every day.","ఖాళీని పూరించండి: She ___ to school every day.","goes","go","going","gone","goes","With she, use the verb goes in the simple present.","She తో Simple Present లో goes వాడాలి."],
+  ["What is a synonym of 'begin'?","'Begin' కు సమానార్థక పదం ఏది?","Start","Finish","Stop","Close","Start","Begin and start have similar meanings.","Begin మరియు Start ఒకే విధమైన అర్థాలు కలిగి ఉంటాయి."],
+  ["Which article fits: ___ apple?","___ apple: సరైన article ఏది?","An","A","Thee","No article","An","Use 'an' before a vowel sound.","అచ్చు ధ్వనితో మొదలయ్యే పదానికి ముందు An వాడాలి."]
+ ],
+ computer:[
+  ["What is the brain of a computer?","కంప్యూటర్ మెదడు అని దేనిని అంటారు?","CPU","Mouse","Monitor","Keyboard","CPU","The CPU processes instructions.","CPU సూచనలను ప్రాసెస్ చేస్తుంది."],
+  ["Which device is used to type?","టైప్ చేయడానికి ఏ పరికరం ఉపయోగిస్తారు?","Keyboard","Speaker","Monitor","Printer","Keyboard","A keyboard is an input device.","కీబోర్డ్ ఒక ఇన్‌పుట్ పరికరం."],
+  ["What does WWW stand for?","WWW పూర్తి రూపం ఏమిటి?","World Wide Web","World Web Window","Wide World Wire","Web World Work","World Wide Web","WWW means World Wide Web.","WWW అంటే World Wide Web."],
+  ["Which of these is an output device?","వీటిలో అవుట్‌పుట్ పరికరం ఏది?","Monitor","Mouse","Keyboard","Scanner","Monitor","A monitor displays information.","మానిటర్ సమాచారాన్ని చూపిస్తుంది."],
+  ["What is the binary value of decimal 2?","దశాంశ సంఖ్య 2 యొక్క బైనరీ రూపం ఏది?","10","01","11","100","10","Decimal 2 is binary 10.","దశాంశ 2 = బైనరీ 10."],
+  ["Which one is a web browser?","వెబ్ బ్రౌజర్ ఏది?","Chrome","Excel","Paint","Calculator","Chrome","Chrome is a web browser.","Chrome ఒక వెబ్ బ్రౌజర్."],
+  ["What does RAM mainly store?","RAM ప్రధానంగా దేనిని నిల్వ చేస్తుంది?","Temporary working data","Printed pages","Long-term files only","Electricity","Temporary working data","RAM holds data currently being used.","ప్రస్తుతం ఉపయోగిస్తున్న డేటాను RAM నిల్వ చేస్తుంది."],
+  ["Which is a programming language?","ప్రోగ్రామింగ్ భాష ఏది?","Python","PDF","Wi-Fi","USB","Python","Python is a programming language.","Python ఒక ప్రోగ్రామింగ్ భాష."],
+  ["What is phishing?","Phishing అంటే ఏమిటి?","Online trick to steal information","A computer game","A printer type","A coding loop","Online trick to steal information","Phishing tries to trick people into sharing private information.","వ్యక్తిగత సమాచారాన్ని మోసపూరితంగా పొందే ప్రయత్నం Phishing."],
+  ["What does URL identify?","URL దేనిని సూచిస్తుంది?","A web address","A keyboard key","A battery","A file size","A web address","URL is the address of a resource on the web.","URL అనేది వెబ్ వనరు చిరునామా."]
+ ],
+ gk:[
+  ["How many days are there in a week?","ఒక వారంలో ఎన్ని రోజులు ఉంటాయి?","7","5","6","8","7","A week has seven days.","ఒక వారంలో ఏడు రోజులు ఉంటాయి."],
+  ["What is the capital of India?","భారతదేశ రాజధాని ఏది?","New Delhi","Mumbai","Chennai","Kolkata","New Delhi","New Delhi is India's capital.","న్యూఢిల్లీ భారతదేశ రాజధాని."],
+  ["Which is the largest ocean?","అతిపెద్ద మహాసముద్రం ఏది?","Pacific Ocean","Indian Ocean","Arctic Ocean","Atlantic Ocean","Pacific Ocean","The Pacific is the world's largest ocean.","పసిఫిక్ ప్రపంచంలోనే అతిపెద్ద మహాసముద్రం."],
+  ["How many colours are in a rainbow traditionally?","సాంప్రదాయంగా ఇంద్రధనస్సులో ఎన్ని రంగులు ఉంటాయి?","7","5","6","8","7","A rainbow is traditionally described as having seven colours.","ఇంద్రధనస్సులో సాంప్రదాయంగా ఏడు రంగులు ఉంటాయి."],
+  ["Which animal is India's national animal?","భారతదేశ జాతీయ జంతువు ఏది?","Tiger","Lion","Elephant","Peacock","Tiger","The Bengal tiger is India's national animal.","బెంగాల్ పులి భారత జాతీయ జంతువు."],
+  ["Which festival is known as the festival of lights?","దీపాల పండుగగా ఏ పండుగ ప్రసిద్ధి?","Diwali","Holi","Eid","Pongal","Diwali","Diwali is widely known as the festival of lights.","దీపావళిని దీపాల పండుగ అంటారు."],
+  ["Which is the fastest land animal?","భూమిపై వేగంగా పరిగెత్తే జంతువు ఏది?","Cheetah","Horse","Lion","Deer","Cheetah","A cheetah can run faster than other land animals.","చిరుత భూమిపై అత్యంత వేగంగా పరిగెత్తే జంతువు."],
+  ["How many continents are there?","భూమిపై ఎన్ని ఖండాలు ఉన్నాయి?","7","5","6","8","7","There are seven commonly recognized continents.","సాధారణంగా ఏడు ఖండాలను గుర్తిస్తారు."],
+  ["Which is the national bird of India?","భారతదేశ జాతీయ పక్షి ఏది?","Peacock","Parrot","Eagle","Swan","Peacock","The Indian peafowl is India's national bird.","నెమలి భారతదేశ జాతీయ పక్షి."],
+  ["Which direction does the Sun rise from?","సూర్యుడు ఏ దిశలో ఉదయిస్తాడు?","East","West","North","South","East","The Sun appears to rise in the east.","సూర్యుడు తూర్పున ఉదయిస్తున్నట్లు కనిపిస్తాడు."]
+ ],
+ history:[
+  ["Who was known as the Father of the Nation in India?","భారత జాతిపితగా ఎవరిని పిలుస్తారు?","Mahatma Gandhi","Jawaharlal Nehru","Subhas Chandra Bose","Sardar Patel","Mahatma Gandhi","Mahatma Gandhi led India's freedom movement through non-violent methods.","మహాత్మా గాంధీ అహింసా మార్గంలో స్వాతంత్ర్య ఉద్యమానికి నాయకత్వం వహించారు."],
+  ["Which is the largest continent?","అతిపెద్ద ఖండం ఏది?","Asia","Africa","Europe","Australia","Asia","Asia is the largest continent by area and population.","విస్తీర్ణం, జనాభా పరంగా ఆసియా అతిపెద్ద ఖండం."],
+  ["The Taj Mahal is in which city?","తాజ్ మహల్ ఏ నగరంలో ఉంది?","Agra","Delhi","Jaipur","Lucknow","Agra","The Taj Mahal is located in Agra, Uttar Pradesh.","తాజ్ మహల్ ఉత్తరప్రదేశ్‌లోని ఆగ్రాలో ఉంది."],
+  ["Who was the first Prime Minister of India?","భారతదేశ తొలి ప్రధానమంత్రి ఎవరు?","Jawaharlal Nehru","Mahatma Gandhi","Rajendra Prasad","Sardar Patel","Jawaharlal Nehru","Jawaharlal Nehru became India's first Prime Minister in 1947.","1947లో జవహర్‌లాల్ నెహ్రూ తొలి ప్రధానమంత్రి అయ్యారు."],
+  ["Which river flows through Egypt?","ఈజిప్టు గుండా ప్రవహించే నది ఏది?","Nile","Amazon","Ganga","Thames","Nile","The Nile is a major river in northeastern Africa.","నైలు ఈశాన్య ఆఫ్రికాలోని ప్రధాన నది."],
+  ["What is the imaginary line at 0° latitude?","0° అక్షాంశం వద్ద ఉన్న ఊహాత్మక రేఖ ఏది?","Equator","Prime Meridian","Tropic of Cancer","Arctic Circle","Equator","The Equator divides Earth into Northern and Southern Hemispheres.","భూమిని ఉత్తర, దక్షిణ అర్ధగోళాలుగా భూమధ్యరేఖ విభజిస్తుంది."],
+  ["Who built the Red Fort in Delhi?","ఢిల్లీలో ఎర్రకోటను ఎవరు నిర్మించారు?","Shah Jahan","Akbar","Ashoka","Babur","Shah Jahan","Mughal emperor Shah Jahan commissioned the Red Fort.","మొఘల్ చక్రవర్తి షాజహాన్ ఎర్రకోటను నిర్మింపజేశారు."],
+  ["Which ocean lies south of India?","భారతదేశానికి దక్షిణంగా ఏ మహాసముద్రం ఉంది?","Indian Ocean","Pacific Ocean","Atlantic Ocean","Arctic Ocean","Indian Ocean","India is bordered to the south by the Indian Ocean.","భారతదేశానికి దక్షిణంగా హిందూ మహాసముద్రం ఉంది."],
+  ["In which year did India become independent?","భారతదేశానికి ఏ సంవత్సరంలో స్వాతంత్ర్యం వచ్చింది?","1947","1950","1942","1935","1947","India became independent on 15 August 1947.","1947 ఆగస్టు 15న భారతదేశానికి స్వాతంత్ర్యం వచ్చింది."],
+  ["Which planet is famous for its rings?","వలయాలకు ప్రసిద్ధి చెందిన గ్రహం ఏది?","Saturn","Mars","Mercury","Earth","Saturn","Saturn has a spectacular ring system.","శని గ్రహానికి ప్రసిద్ధమైన వలయాలు ఉన్నాయి."]
+ ]
+};
+const subjects=[
+ {id:"math",icon:"🔢",en:"Math Kingdom",te:"గణిత రాజ్యం",sub:"Numbers, puzzles & patterns"},
+ {id:"science",icon:"🔬",en:"Science Planet",te:"విజ్ఞాన గ్రహం",sub:"Discover how the world works"},
+ {id:"english",icon:"📚",en:"English Castle",te:"ఆంగ్ల కోట",sub:"Words, grammar & reading"},
+ {id:"computer",icon:"💻",en:"Computer City",te:"కంప్యూటర్ నగరం",sub:"Digital skills & coding"},
+ {id:"gk",icon:"🌍",en:"Knowledge Island",te:"జ్ఞాన ద్వీపం",sub:"Amazing facts about our world"},
+ {id:"history",icon:"🏛️",en:"History Land",te:"చరిత్ర భూమి",sub:"History & geography"}
+];
+const $=id=>document.getElementById(id);
+let lang="en",questions=[],index=0,score=0,correct=0,locked=false,current=null;
+let saved=JSON.parse(localStorage.getItem("brainQuestSave")||'{"coins":0,"best":0,"played":0}');
+function save(){localStorage.setItem("brainQuestSave",JSON.stringify(saved));updateStats()}
+function updateStats(){$("coins").textContent=saved.coins;$("totalCoins").textContent=saved.coins;$("bestScore").textContent=saved.best;$("played").textContent=saved.played}
+const translations={
+ en:{hero:"Play. Explore. Learn. Win!",sub:"A fun learning adventure for Classes 1–10.",setup:"Set up your adventure",grade:"Your class",language:"Language",best:"Best score",played:"Games played",coins:"Coins earned",choose:"Choose your learning world",next:"Next question →",back:"← Back to worlds",complete:"Adventure complete!",correct:"Correct",earned:"Coins earned",accuracy:"Accuracy",home:"Play another world",great:"Great effort! Keep exploring and learning."},
+ te:{hero:"ఆడండి. అన్వేషించండి. నేర్చుకోండి. గెలవండి!",sub:"1–10 తరగతుల విద్యార్థుల కోసం సరదా అభ్యాస ప్రయాణం.",setup:"మీ ప్రయాణాన్ని ప్రారంభించండి",grade:"మీ తరగతి",language:"భాష",best:"ఉత్తమ స్కోరు",played:"ఆడిన ఆటలు",coins:"సంపాదించిన నాణేలు",choose:"మీ అభ్యాస ప్రపంచాన్ని ఎంచుకోండి",next:"తదుపరి ప్రశ్న →",back:"← ప్రపంచాలకు తిరిగి వెళ్ళండి",complete:"ప్రయాణం పూర్తయింది!",correct:"సరైనవి",earned:"సంపాదించిన నాణేలు",accuracy:"ఖచ్చితత్వం",home:"మరో ప్రపంచాన్ని ఆడండి",great:"చక్కగా ప్రయత్నించారు! నేర్చుకుంటూ ముందుకు సాగండి."}
+};
+function applyLanguage(){lang=$("language").value;let t=translations[lang];$("heroTitle").textContent=t.hero;$("heroSub").textContent=t.sub;$("setupTitle").textContent=t.setup;$("gradeLabel").textContent=t.grade;$("languageLabel").textContent=t.language;$("bestLabel").textContent=t.best;$("playedLabel").textContent=t.played;$("coinLabel").textContent=t.coins;$("chooseTitle").textContent=t.choose;$("nextBtn").textContent=t.next;$("quitBtn").textContent=t.back;$("resultTitle").textContent=t.complete;$("correctLabel").textContent=t.correct;$("earnedLabel").textContent=t.earned;$("accuracyLabel").textContent=t.accuracy;$("homeBtn").textContent=t.home;renderSubjects()}
+function renderSubjects(){$("subjects").innerHTML="";subjects.forEach(s=>{let b=document.createElement("button");b.className="subject";b.innerHTML=`<span style="font-size:25px">${s.icon}</span><br>${lang==="te"?s.te:s.en}<small>${s.sub}</small>`;b.onclick=()=>startGame(s);$("subjects").appendChild(b)})}
+function startGame(subject){current=subject;questions=[...data[subject.id]].sort(()=>Math.random()-.5);index=0;score=0;correct=0;locked=false;$("home").classList.add("hidden");$("result").classList.add("hidden");$("game").classList.remove("hidden");$("subjectName").textContent=subject.icon+" "+(lang==="te"?subject.te:subject.en);showQuestion()}
+function showQuestion(){locked=false;let q=questions[index];$("qCount").textContent=(index+1)+"/10";$("progress").style.width=(index/10*100)+"%";$("gradeInfo").textContent=(lang==="te"?"తరగతి ":"Class ")+$("grade").value+" · 10 "+(lang==="te"?"ప్రశ్నలు":"questions");$("question").textContent=lang==="te"?q[1]:q[0];$("feedback").classList.add("hidden");$("nextBtn").classList.add("hidden");$("answers").innerHTML="";
+let options=[q[2],q[3],q[4],q[5]].sort(()=>Math.random()-.5);
+options.forEach(opt=>{let b=document.createElement("button");b.className="answer";b.textContent=opt;b.onclick=()=>chooseAnswer(b,opt,q);$("answers").appendChild(b)})}
+function chooseAnswer(btn,opt,q){if(locked)return;locked=true;let right=q[6];[...$("answers").children].forEach(b=>{b.disabled=true;if(b.textContent===right)b.classList.add("correct")});if(opt===right){score+=10;correct++;}else btn.classList.add("wrong");$("feedback").classList.remove("hidden");$("feedback").textContent=(opt===right?"✅ ":"💡 ")+(lang==="te"?q[8]:q[7]);$("progress").style.width=((index+1)/10*100)+"%";$("nextBtn").classList.remove("hidden");$("nextBtn").onclick=()=>{index++;if(index<10)showQuestion();else finishGame()}}
+function finishGame(){let earned=correct*5;saved.coins+=earned;saved.best=Math.max(saved.best,score);saved.played++;save();$("game").classList.add("hidden");$("result").classList.remove("hidden");$("finalScore").textContent=score;$("correctCount").textContent=correct;$("earnedCoins").textContent=earned;$("accuracy").textContent=(correct*10)+"%";$("resultMessage").textContent=translations[lang].great;$("resultEmoji").textContent=score>=80?"🏆":score>=50?"🌟":"💪"}
+function goHome(){$("result").classList.add("hidden");$("game").classList.add("hidden");$("home").classList.remove("hidden")}
+$("language").addEventListener("change",applyLanguage);$("homeBtn").onclick=goHome;$("quitBtn").onclick=goHome;
+updateStats();applyLanguage();
+</script>
+</body>
+</html>
